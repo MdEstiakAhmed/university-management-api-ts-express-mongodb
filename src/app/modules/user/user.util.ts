@@ -1,6 +1,6 @@
 import { User } from './user.model'
 
-export const findLastUserId = async (): Promise<string | undefined> => {
+const findLastUserId = async (): Promise<string | undefined> => {
   const lastStudent = await User.findOne(
     {
       role: 'student',
@@ -15,10 +15,14 @@ export const findLastUserId = async (): Promise<string | undefined> => {
   return lastStudent?.id ? lastStudent.id.substring(4) : undefined
 }
 
-export const generateUserId = async (): Promise<string> => {
+const generateUserId = async (): Promise<string> => {
   const currentId = (await findLastUserId()) || (0).toString().padStart(5, '0') //00000
   //increment by 1
   const incrementedId = (parseInt(currentId) + 1).toString().padStart(5, '0')
 
   return incrementedId
+}
+
+export const UserUtil = {
+  generateUserId,
 }
