@@ -1,16 +1,47 @@
-import app from './app'
-import config from './config'
+/* eslint-disable no-console */
+import { Server } from 'http'
+// import mongoose from 'mongoose';
 
-const main = async () => {
+import app from './app'
+import config from './config/index'
+import { errorLogger, successLogger } from './shared/logger'
+
+process.on('uncaughtException', (error) => {
+  errorLogger.error(error)
+  process.exit(1)
+})
+
+let server: Server
+
+async function bootstrap() {
   try {
     // await mongoose.connect(config.databaseURL as string);
-    console.log('Connected to MongoDB')
-    app.listen(config.port, () => {
-      console.log(`Example app listening at http://localhost:${config.port}`)
+    successLogger.info(`🛢   Database is connected successfully`)
+
+    server = app.listen(config.port, () => {
+      successLogger.info(`Application  listening on port ${config.port}`)
     })
-  } catch (error) {
-    console.error(error)
+  } catch (err) {
+    errorLogger.error('Failed to connect database', err)
   }
+
+  process.on('unhandledRejection', (error) => {
+    if (server) {
+      server.close(() => {
+        errorLogger.error(error)
+        process.exit(1)
+      })
+    } else {
+      process.exit(1)
+    }
+  })
 }
 
-main()
+bootstrap()
+
+process.on('SIGTERM', () => {
+  successLogger.info('SIGTERM is received')
+  if (server) {
+    server.close()
+  }
+})

@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+
 import dotenv from 'dotenv'
 import path from 'path'
 dotenv.config({
@@ -8,6 +10,7 @@ dotenv.config({
 })
 
 export default {
+  env: process.env.NODE_ENV,
   port: process.env.PORT,
   databaseURL: process.env.DATABASE_URL,
   defaultStudentPass: process.env.DEFAULT_STUDENT_PASS,
